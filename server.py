@@ -9,7 +9,7 @@ from analytics import router as analytics_router
 XGBoostModel = joblib.load("pkl_files/xgb_model.pkl")
 keplerGBM = joblib.load("pkl_files/light_gbm_model_kepler.pkl")
 tessGBM = joblib.load("pkl_files/TESS_LightGBM.pkl")
-K2GBM = joblib.load("pkl_files/K2_FinalV2.pkl")
+K2GBM = joblib.load("pkl_files/K2_FinalV3.pkl")
 
 app = FastAPI()
 
