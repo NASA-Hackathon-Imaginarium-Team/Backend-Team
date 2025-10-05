@@ -13,15 +13,9 @@ K2GBM = joblib.load("pkl_files/K2_FinalV2.pkl")
 
 app = FastAPI()
 
-origins = [
-    "http://localhost:3000",   # your frontend URL
-    "http://127.0.0.1:3000",   # optional
-    "*"                        # allow all origins (for testing only)
-]
-
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,       # or ["*"] to allow all
+    allow_origins=["*"],       # or ["*"] to allow all
     allow_credentials=True,
     allow_methods=["*"],         # allow all HTTP methods
     allow_headers=["*"],         # allow all headers
