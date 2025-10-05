@@ -77,22 +77,24 @@ def predict(features: Features):
 
 @app.post("/predict/K2")
 def predict(features: Features):
-    # Convert to DataFrame
-    df = pd.DataFrame([features.data])
-    
-    prediction = K2GBM.predict(df)[0]
-    probs = K2GBM.predict_proba(df)[0].tolist()
+    try:
+        # Convert to DataFrame
+        df = pd.DataFrame([features.data])
 
-    predictionText = ""
-    if (prediction == 1):
-        predictionText = "Probable"
-    elif (prediction == 0):
-        predictionText = "Improbable"
+        # Example model prediction
+        prediction = K2GBM.predict(df)[0]
+        probs = K2GBM.predict_proba(df)[0].tolist()
 
-    return {
-        "prediction": predictionText,
-        "probabilities": probs
-    }
+        predictionText = "Probable" if prediction == 1 else "Improbable"
+
+        return {
+            "prediction": predictionText,
+            "probabilities": probs
+        }
+
+    except Exception as e:
+        # Return the actual error message
+        raise HTTPException(status_code=400, detail=str(e))
 
 PORT = int(os.getenv("PORT", "8000"))
 
