@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 import joblib
 import pandas as pd
@@ -89,6 +89,51 @@ def predict(features: Features):
     except Exception as e:
         # Return the actual error message
         raise HTTPException(status_code=400, detail=str(e))
+
+@app.get("/hot-stars")
+def get_hot_stars():
+    """
+    Get the top 50 hottest stars from Kepler dataset based on koi_teq (equilibrium temperature).
+    """
+    try:
+        # Read the Kepler unmodified dataset
+        df = pd.read_csv("datasets/unmodified/Kepler Objects of Interest.csv", comment="#")
+
+        # Check if koi_teq column exists
+        if "koi_teq" not in df.columns:
+            raise HTTPException(
+                status_code=500,
+                detail="Column 'koi_teq' not found in dataset"
+            )
+
+        # Get top 50 hottest stars, excluding NaN values
+        hot_stars = df.nlargest(50, "koi_teq")[["kepid", "kepler_name", "koi_teq"]].copy()
+
+        # Convert to list of dictionaries
+        results = []
+        for _, row in hot_stars.iterrows():
+            results.append({
+                "kepid": int(row["kepid"]) if pd.notna(row["kepid"]) else None,
+                "kepler_name": row["kepler_name"] if pd.notna(row["kepler_name"]) else None,
+                "temperature": float(row["koi_teq"]) if pd.notna(row["koi_teq"]) else None
+            })
+
+        return {
+            "dataset": "kepler",
+            "count": len(results),
+            "results": results
+        }
+
+    except FileNotFoundError:
+        raise HTTPException(
+            status_code=404,
+            detail="Dataset file not found: datasets/unmodified/Kepler Objects of Interest.csv"
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Error processing dataset: {str(e)}"
+        )
 
 PORT = int(os.getenv("PORT", "8000"))
 
