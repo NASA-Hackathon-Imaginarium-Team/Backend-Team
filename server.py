@@ -4,6 +4,7 @@ import joblib
 import pandas as pd
 import os
 from fastapi.middleware.cors import CORSMiddleware
+from analytics import router as analytics_router
 
 XGBoostModel = joblib.load("pkl_files/xgb_model.pkl")
 keplerGBM = joblib.load("pkl_files/light_gbm_model_kepler.pkl")
@@ -25,6 +26,9 @@ app.add_middleware(
     allow_methods=["*"],         # allow all HTTP methods
     allow_headers=["*"],         # allow all headers
 )
+
+# Include analytics router
+app.include_router(analytics_router)
 
 @app.get("/")
 def returnHello():
