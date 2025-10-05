@@ -11,6 +11,20 @@ K2GBM = joblib.load("pkl_files/lightgbm_tuned_model_K2.pkl")
 
 app = FastAPI()
 
+origins = [
+    "http://localhost:3000",   # your frontend URL
+    "http://127.0.0.1:3000",   # optional
+    "*"                        # allow all origins (for testing only)
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,       # or ["*"] to allow all
+    allow_credentials=True,
+    allow_methods=["*"],         # allow all HTTP methods
+    allow_headers=["*"],         # allow all headers
+)
+
 @app.get("/")
 def returnHello():
     return {"message": "Hello"}
@@ -36,6 +50,14 @@ def predict(features: Features):
         "prediction": predictionText,
         "probabilities": probs
     }
+
+@app.post("/predict/kepler/csv")
+async def predict_csv(file: UploadFile = File(...)):
+    df = pd.read_csv(file.file)
+    predictions = keplerGBM.predict(df)
+    df['prediction'] = ["Probable" if p==1 else "Improbable" for p in predictions]
+    df.to_csv("predictions.csv", index=False)
+    return {"message": "Predictions saved to predictions.csv"}
 
 @app.post("/predict/tess")
 def predict(features: Features):
