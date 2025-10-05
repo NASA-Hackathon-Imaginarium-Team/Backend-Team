@@ -3,6 +3,7 @@ from pydantic import BaseModel
 import joblib
 import pandas as pd
 import os
+from fastapi.middleware.cors import CORSMiddleware
 
 XGBoostModel = joblib.load("pkl_files/xgb_model.pkl")
 keplerGBM = joblib.load("pkl_files/light_gbm_model_kepler.pkl")
@@ -10,6 +11,20 @@ tessGBM = joblib.load("pkl_files/TESS_LightGBM.pkl")
 K2GBM = joblib.load("pkl_files/lightgbm_tuned_model_K2.pkl")
 
 app = FastAPI()
+
+origins = [
+    "http://localhost:3000",   # your frontend URL
+    "http://127.0.0.1:3000",   # optional
+    "*"                        # allow all origins (for testing only)
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,       # or ["*"] to allow all
+    allow_credentials=True,
+    allow_methods=["*"],         # allow all HTTP methods
+    allow_headers=["*"],         # allow all headers
+)
 
 @app.get("/")
 def returnHello():
