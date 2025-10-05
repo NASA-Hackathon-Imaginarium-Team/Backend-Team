@@ -1,4 +1,4 @@
-from fastapi import FastAPI, File, UploadFile
+from fastapi import FastAPI
 from pydantic import BaseModel
 import joblib
 import pandas as pd
@@ -51,14 +51,6 @@ def predict(features: Features):
         "prediction": predictionText,
         "probabilities": probs
     }
-
-@app.post("/predict/kepler/csv")
-async def predict_csv(file: UploadFile = File(...)):
-    df = pd.read_csv(file.file)
-    predictions = keplerGBM.predict(df)
-    df['prediction'] = ["Probable" if p==1 else "Improbable" for p in predictions]
-    df.to_csv("predictions.csv", index=False)
-    return {"message": "Predictions saved to predictions.csv"}
 
 @app.post("/predict/tess")
 def predict(features: Features):
