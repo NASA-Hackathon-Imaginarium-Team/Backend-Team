@@ -3,6 +3,7 @@ from pydantic import BaseModel
 import joblib
 import pandas as pd
 import os
+from fastapi.middleware.cors import CORSMiddleware
 
 XGBoostModel = joblib.load("pkl_files/xgb_model.pkl")
 keplerGBM = joblib.load("pkl_files/light_gbm_model_kepler.pkl")
