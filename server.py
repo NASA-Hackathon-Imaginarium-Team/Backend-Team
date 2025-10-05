@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from pydantic import BaseModel
 import joblib
 import pandas as pd
+import os
 
 XGBoostModel = joblib.load("pkl_files/xgb_model.pkl")
 keplerGBM = joblib.load("pkl_files/light_gbm_model_kepler.pkl")
@@ -54,7 +55,9 @@ def predict(features: Features):
         "probabilities": probs
     }
 
+PORT = int(os.getenv("PORT", "8000"))  # Render injects PORT; default for local dev
+
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run("server:app", host="0.0.0.0", port=8000)
+    uvicorn.run("server:app", host="0.0.0.0", port=PORT)
 
